@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 'root'
+      MYSQL_USER: 'user'
+      MYSQL_PASS: 'pass'
+    volumes:
+      - ./mysql/container-data:/var/lib/mysql
+      - ./mysql/conf.d:/etc/mysql/conf.d
+      - ./mysql/airport-db:/var/airport-db
+    ports:
+      - "3306:3306"
+    restart: on-failure
+    # run util.loadDump("airport-db", {threads: 8, createInvisiblePKs:false, deferTableIndexes: "all", ignoreVersion: true})
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin
+    ports:
+      - 6033:80
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOSTS=mysql
+      - PMA_PORTS=3306
+      - PMA_USER=root
+      - PMA_PASSWORD=root
+
+#  redis:
+#    build: ./redis
+#    container_name: redis
+#    ports:
+#      - 6379:6379
+#    restart: on-failure
+#
+#  api:
+#    build: ./api
+#    container_name: my-api
+#    depends_on:
+#      - mysql
+#      - redis
+#    ports:
+#      - 8080:8080
+
+networks:
+  default:
